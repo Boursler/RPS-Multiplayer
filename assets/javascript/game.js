@@ -10,20 +10,23 @@ var config = {
 };
 firebase.initializeApp(config);
 var database = firebase.database();
+function Player(name) {
+	this.name = name;
+	this.wins = 0
+	this.losses = 0;
+	this.guess;
+}
+
+
 var rpsGame = {
 	R: 0,
 	P: 1,
 	S: 2,
-	Player: function (name) {
-		this.name = name;
-		this.wins = 0
-		this.losses = 0;
-		this.guess = "";
-	},
-	player1: new Player(player1),
-	player2: new Player(player2),
+
+	player1: new Player("player1"),
+	player2: new Player("player2"),
 	play: function () {
-		var outcome = rpsGame.player2.guess - rpsGame.player1.guess % 3;
+		var outcome = (rpsGame.player2.guess - rpsGame.player1.guess + 3) % 3;
 		if (outcome === 1) {
 			rpsGame.player2.wins++;
 			rpsGame.player1.losses++;
