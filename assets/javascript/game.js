@@ -23,7 +23,7 @@ var rpsGame = {
 	player1: new Player(player1),
 	player2: new Player(player2),
 	play: function () {
-		var outcome = rpsGame.player2.guess - rpsGame.player2.guess % 3;
+		var outcome = rpsGame.player2.guess - rpsGame.player1.guess % 3;
 		if (outcome === 1) {
 			rpsGame.player2.wins++;
 			rpsGame.player1.losses++;
