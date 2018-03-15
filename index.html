@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Multiplayer Rock Paper Scissors!</title>
+	<link rel="stylesheet" href="assets/css/reset.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	 crossorigin="anonymous">
+
+	<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+
+<body>
+	<div class="container">
+		<h1>Rock, Paper Scissors Challenge!</h1>
+		<div class="row">
+			<div id="player1Div" class="col-md-4">
+				<p>Player 1:</p>
+				<p id="player1Id"></p>
+				<p>Choice:</p>
+				<button class="btn btn-primary">Rock</button>
+				<button class="btn btn-primary">Paper</button>
+				<button class="btn btn-primary">Scissors</button>
+				<p>Wins:</p>
+				<p id="player1Wins"></p>
+				<p>Losses:</p>
+				<p id="player1Losses"></p>
+			</div>
+			<div id="outcomesDiv" class="col-md-4">
+				<p id="outcome">Outcome</p>
+			</div>
+			<div id="player2Div" class="col-md-4">
+				<p>Player 2:</p>
+				<p id="player2Id"></p>
+				<p>Choice:</p>
+				<button class="btn btn-primary">Rock</button>
+				<button class="btn btn-primary">Paper</button>
+				<button class="btn btn-primary">Scissors</button>
+				<p>Wins:</p>
+				<p id="player2Wins"></p>
+				<p>Losses:</p>
+				<p id="player2Losses"></p>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="assets/javascript/game.js"></script>
+</body>
+
+</html>
