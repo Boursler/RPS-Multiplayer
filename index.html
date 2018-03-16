@@ -17,11 +17,17 @@
 		<div class="row">
 			<div id="player1Div" class="col-md-4">
 				<p>Player 1:</p>
-				<p id="player1Id"></p>
+				<form id="player1">
+					<label for="player1Name">Player 1's Name!</label>
+					<input type="text" id="player1Name">
+					<br>
+					<!-- <input id="add-player1" type="submit" value="Join" class="btn btn-danger"> -->
+					<button id="add-player1">Join</button>
+				</form>
 				<p>Choice:</p>
-				<button class="btn btn-primary">Rock</button>
-				<button class="btn btn-primary">Paper</button>
-				<button class="btn btn-primary">Scissors</button>
+				<button class="play btn btn-primary" id="R">Rock</button>
+				<button class="play btn btn-primary" id="P">Paper</button>
+				<button class="play btn btn-primary" id="S">Scissors</button>
 				<p>Wins:</p>
 				<p id="player1Wins"></p>
 				<p>Losses:</p>
@@ -30,18 +36,23 @@
 			<div id="outcomesDiv" class="col-md-4">
 				<p id="outcome">Outcome</p>
 			</div>
-			<div id="player2Div" class="col-md-4">
+			<!-- <div id="player2Div" class="col-md-4">
 				<p>Player 2:</p>
-				<p id="player2Id"></p>
+				<form id="player2">
+					<label for="player2Name">Player 2's Name!</label>
+					<input type="text" id="player2Name">
+					<br>
+					<input id="add-player2" type="submit" value="Join" class="btn btn-danger">
+				</form>
 				<p>Choice:</p>
-				<button class="btn btn-primary">Rock</button>
-				<button class="btn btn-primary">Paper</button>
-				<button class="btn btn-primary">Scissors</button>
+				<button class="play btn btn-primary">Rock</button>
+				<button class="play btn btn-primary">Paper</button>
+				<button class="play btn btn-primary">Scissors</button>
 				<p>Wins:</p>
 				<p id="player2Wins"></p>
 				<p>Losses:</p>
 				<p id="player2Losses"></p>
-			</div>
+			</div> -->
 		</div>
 	</div>
 
