@@ -20,20 +20,21 @@ function Player(name) {
 var player1;
 var player2;
 var childrenCount;
+var playerId;
 var rpsGame = {
 	R: 0,
 	P: 1,
 	S: 2,
 
 	play: function () {
-		var outcome = (rpsGame.player2.guess - rpsGame.player1.guess + 3) % 3;
+		var outcome = (player2.play - player1.play + 3) % 3;
 		if (outcome === 1) {
-			rpsGame.player2.wins++;
-			rpsGame.player1.losses++;
+			player2.wins++;
+			player1.losses++;
 		}
 		else if (outcome === 2) {
-			rpsGame.player1.wins++;
-			rpsGame.player2.losses++;
+			player1.wins++;
+			player2.losses++;
 		}
 		else if (outcome === 0) {
 			//game is tied
@@ -44,10 +45,14 @@ var rpsGame = {
 function assignPlayer() {
 	event.preventDefault();
 	var name;
+	playerId = nextId;
 	name = $("#player1Name").val();
 	console.log("adding name" + name);
-	player1 = new Player(name)
-	database.ref('players/' + nextId).set(player1);
+	player = new Player(name)
+	database.ref('players/' + playerId).set(player);
+	sessionStorage.setItem("playerName", player.name);
+	sessionStorage.setItem("playerWins", player.wins);
+	sessionStorage.setItem("playerLosses", player.losses);
 }
 
 function makePlay() {
@@ -68,24 +73,18 @@ database.ref().on("value", function (data) {
 		player_list = data.val().players;
 	}
 	console.log(player_list);
-	if (player_list)
+	if (player_list) {
 		nextId = player_list.length;
+
+
+		console.log("Next id: " + nextId);
+		console.log(JSON.stringify(data))
+		console.log(childrenCount + "numPlayers");
+
+	}
 	else
 		nextId = 1;
 
-	console.log("Next id: " + nextId);
-	console.log(JSON.stringify(data))
-	console.log(childrenCount + "numPlayers");
-	if (childrenCount === 1) {
-		console.log(data.val());
-
-	}
-	else if (childrenCount === 2) {
-		console.log(data.val());
-	}
-	else {
-		console.log("users full");
-	}
 
 }, function (error) {
 	//handle error
