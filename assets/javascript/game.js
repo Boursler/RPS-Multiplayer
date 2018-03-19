@@ -11,6 +11,7 @@ var config = {
 
 firebase.initializeApp(config);
 var database = firebase.database();
+var nextMessage;
 function Player(name, playerId) {
 	this.playerId = playerId;
 	this.name = name;
@@ -67,7 +68,7 @@ var rpsGame = {
 	updateGameState: function (data) {
 		var player_list;
 		if (data.val() !== null) {
-			player_list = data.val().players;
+			player_list = data.val();
 			rpsGame.playerCount = player_list.length - 1;
 			if (rpsGame.playerCount === 2) {
 				rpsGame.nextId = 3;
@@ -101,8 +102,6 @@ var rpsGame = {
 
 }
 
-
-
 function drawScreen() {
 	$("#add-player1").off("click");
 
@@ -124,9 +123,44 @@ function drawScreen() {
 		$("#player1Losses").hide();
 	}
 }
-$(".play").click(rpsGame.submitPlay);
+function makeMessage() {
+	event.preventDefault();
+	if (rpsGame.player) {
 
-database.ref().on("value", function (data) {
+		var message = {
+			content: $("#writeMessage").val().trim(),
+			sender: rpsGame.player.name
+		}
+		database.ref("messages/" + nextMessage).set(message);
+
+	}
+}
+
+function drawMessage(messageData) {
+	if (messageData.val() !== null) {
+		$("#pastMessages").empty();
+
+		console.log(messageData.val());
+		var message = messageData.val();
+		for (i = 1; i < message.length; i++) {
+			var p = $("<p>");
+			p = p.text(message[i].sender + ": " + message[i].content);
+			$("#pastMessages").append(p);
+		}
+	}
+}
+
+function messageState(messageData) {
+	if (messageData.val() !== null)
+		nextMessage = messageData.val().length;
+	else
+		nextMessage = 1;
+}
+$(".play").click(rpsGame.submitPlay);
+$("#sendMessage").click(makeMessage);
+
+
+database.ref("players/").on("value", function (data) {
 	rpsGame.updateGameState(data);
 
 	if (rpsGame.opponent !== "" && rpsGame.player !== "") {
@@ -134,7 +168,14 @@ database.ref().on("value", function (data) {
 			rpsGame.play();
 		}
 	}
+
 	drawScreen();
+}, function (error) {
+	//handle error
+});
+database.ref("messages/").on("value", function (messageData) {
+	messageState(messageData);
+	drawMessage(messageData);
 }, function (error) {
 	//handle error
 });
