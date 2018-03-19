@@ -12,6 +12,7 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 var nextMessage;
+var message;
 function Player(name, playerId) {
 	this.playerId = playerId;
 	this.name = name;
@@ -29,30 +30,35 @@ var rpsGame = {
 	player: "",
 	opponent: "",
 	nextId: 3,
-
+	status: "",
 	play: function () {
 		var outcome = (parseInt(this.opponent.play) - parseInt(this.player.play) + 3) % 3;
+
+		this.player.play = "";
+
 		if (outcome === 1) {
 			//submit changes to database
 			this.player.losses++;
-
+			this.status = "lose";
 		}
 		else if (outcome === 2) {
 			this.player.wins++;
 			//submit changes to database
-
+			this.status = "win";
 		}
 		else if (outcome === 0) {
 			//game is tied
+			this.status = "tie";
 		}
-		this.player.play = "";
-		database.ref("players/" + this.player.playerId).set(this.player);
+
+		database.ref("players/" + rpsGame.player.playerId).set(rpsGame.player);
 
 	},
 	submitPlay: function () {
 		//check if there has been a play
 		//if no:add play based on ID
 		//if yes: don't allow play
+		console.log("Submitting");
 		rpsGame.player.play = $(this).attr("value");
 		database.ref("players/" + rpsGame.player.playerId + "/play").set(rpsGame.player.play);
 	},
@@ -91,8 +97,6 @@ var rpsGame = {
 			if (rpsGame.playerCount === 2) {
 				player_list[0] = player_list[2];
 				rpsGame.opponent = player_list[(rpsGame.player.playerId + 1) % 2];
-
-
 			}
 			else if (rpsGame.playerCount === 1) {
 				rpsGame.opponent = "";
@@ -104,16 +108,21 @@ var rpsGame = {
 
 function drawScreen() {
 	$("#add-player1").off("click");
+	$(".play").off("click");
+	drawMessage();
 
 	if (rpsGame.nextId < 3 && rpsGame.player === "") {
 		$("#add-player1").click(rpsGame.assignPlayer);
 	}
+
 	if (rpsGame.player) {
 		$("#player1").hide();
 		$("#playerName").show();
 		$("#playerName").text(rpsGame.player.name);
 		$("#player1Wins").show().text(rpsGame.player.wins);
 		$("#player1Losses").show().text(rpsGame.player.losses);
+		$("#choiceDiv").show();
+		$(".play").on("click", rpsGame.submitPlay);
 
 	}
 	else {
@@ -121,7 +130,30 @@ function drawScreen() {
 		$("#playerName").hide();
 		$("#player1Wins").hide();
 		$("#player1Losses").hide();
+		$("#choiceDiv").hide();
+		$(".play").off("click");
 	}
+
+	$("#opponent-name").text("");
+	$("#playStatus").text("");
+	if (rpsGame.opponent !== "") {
+		$("#opponent-name").text("Opponent is: " + rpsGame.opponent.name);
+		if (rpsGame.opponent.play === "") {
+			$("#playStatus").text("Waiting for opponent play.");
+		}
+		else {
+			$("#playStatus").text("");
+		}
+	} else if (rpsGame.player) {
+		$("#opponent-name").text("Waiting for an opponent to join.");
+	}
+	if (rpsGame.status === "lose")
+		$("#playStatus").text("You lose!");
+	else if (rpsGame.status === "win")
+		$("#playStatus").text("You win!");
+	else if (rpsGame.status === "tie")
+		$("#playStatus").text("Tied game!");
+
 }
 function makeMessage() {
 	event.preventDefault();
@@ -136,27 +168,29 @@ function makeMessage() {
 	}
 }
 
-function drawMessage(messageData) {
-	if (messageData.val() !== null) {
-		$("#pastMessages").empty();
-
-		console.log(messageData.val());
-		var message = messageData.val();
-		for (i = 1; i < message.length; i++) {
-			var p = $("<p>");
-			p = p.text(message[i].sender + ": " + message[i].content);
-			$("#pastMessages").append(p);
+function drawMessage() {
+	$("#pastMessages").empty();
+	if (rpsGame.player) {
+		if (message !== null) {
+			for (i = 1; i < message.length; i++) {
+				var p = $("<p>");
+				p = p.text(message[i].sender + ": " + message[i].content);
+				$("#pastMessages").append(p);
+			}
 		}
 	}
+	else
+		$("#pastMessages").append("Sorry, only players may use the messager.");
 }
 
 function messageState(messageData) {
+	message = messageData.val();
 	if (messageData.val() !== null)
 		nextMessage = messageData.val().length;
 	else
 		nextMessage = 1;
 }
-$(".play").click(rpsGame.submitPlay);
+
 $("#sendMessage").click(makeMessage);
 
 
@@ -175,7 +209,7 @@ database.ref("players/").on("value", function (data) {
 });
 database.ref("messages/").on("value", function (messageData) {
 	messageState(messageData);
-	drawMessage(messageData);
+	drawMessage();
 }, function (error) {
 	//handle error
 });
