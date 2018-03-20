@@ -1,0 +1,7 @@
+#pastMessages{
+	overflow: scroll;
+	height: 500px;
+	border-width: 3px;
+	border-style: inset;
+	border-color: black;
+}

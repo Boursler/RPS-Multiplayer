@@ -148,11 +148,12 @@ function drawScreen() {
 		$("#opponent-name").text("Waiting for an opponent to join.");
 	}
 	if (rpsGame.status === "lose")
-		$("#playStatus").text("You lose!");
+		$("#playStatus").text("You lost the last game");
 	else if (rpsGame.status === "win")
-		$("#playStatus").text("You win!");
+		$("#playStatus").text("You won the last game");
 	else if (rpsGame.status === "tie")
-		$("#playStatus").text("Tied game!");
+		$("#playStatus").text("The last game tied");
+
 
 }
 function makeMessage() {
