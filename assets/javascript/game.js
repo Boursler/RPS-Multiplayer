@@ -13,6 +13,7 @@ firebase.initializeApp(config);
 var database = firebase.database();
 var nextMessage;
 var message;
+//player constructor
 function Player(name, playerId) {
 	this.playerId = playerId;
 	this.name = name;
@@ -21,48 +22,48 @@ function Player(name, playerId) {
 	this.play = "";
 }
 
-
+//rps object
 var rpsGame = {
-	R: 0,
-	P: 1,
-	S: 2,
+	// R: 0,
+	// P: 1,
+	// S: 2,
+	//key for outcomes
 	playerCount: 0,
 	player: "",
 	opponent: "",
 	nextId: 3,
 	status: "",
 	play: function () {
-		var outcome = (parseInt(this.opponent.play) - parseInt(this.player.play) + 3) % 3;
 
+		var outcome = (parseInt(this.opponent.play) - parseInt(this.player.play) + 3) % 3;
 		this.player.play = "";
 
 		if (outcome === 1) {
-			//submit changes to database
+
 			this.player.losses++;
 			this.status = "lose";
 		}
 		else if (outcome === 2) {
 			this.player.wins++;
-			//submit changes to database
+
 			this.status = "win";
 		}
 		else if (outcome === 0) {
-			//game is tied
+
 			this.status = "tie";
 		}
-
+		//update the database with new values
 		database.ref("players/" + rpsGame.player.playerId).set(rpsGame.player);
 
 	},
 	submitPlay: function () {
-		//check if there has been a play
-		//if no:add play based on ID
-		//if yes: don't allow play
-		console.log("Submitting");
+		//submit a play to the database from value attribute of rock, paper, or scissors button
 		rpsGame.player.play = $(this).attr("value");
 		database.ref("players/" + rpsGame.player.playerId + "/play").set(rpsGame.player.play);
 	},
 	assignPlayer: function () {
+		//assigns playerId based on nextId when the database changed, run player constructor on value entered into name form
+		//set an onDisconnect listener to remove a node from the database when a player refreshes their browser or leaves the room.
 		event.preventDefault();
 		var name;
 		playerId = rpsGame.nextId;
@@ -71,10 +72,13 @@ var rpsGame = {
 		database.ref('players/' + playerId).set(rpsGame.player);
 		database.ref("players/" + playerId.toString()).onDisconnect().remove();
 	},
+
 	updateGameState: function (data) {
+		//update game state
 		var player_list;
 		if (data.val() !== null) {
 			player_list = data.val();
+			//firebase gives player_list an extra empty element at the start of the array
 			rpsGame.playerCount = player_list.length - 1;
 			if (rpsGame.playerCount === 2) {
 				rpsGame.nextId = 3;
@@ -95,6 +99,7 @@ var rpsGame = {
 		}
 		if (rpsGame.player) {
 			if (rpsGame.playerCount === 2) {
+				//store element 2 of player_list at position 0 to use the remainder operator to find the opponent
 				player_list[0] = player_list[2];
 				rpsGame.opponent = player_list[(rpsGame.player.playerId + 1) % 2];
 			}
@@ -107,14 +112,15 @@ var rpsGame = {
 }
 
 function drawScreen() {
+	//turn off clicks -- they will be turned on when needed
 	$("#add-player1").off("click");
 	$(".play").off("click");
 	drawMessage();
-
+	//turn on ability to assign a player if there are the less than the needed number of players and there isn't one in the room already
 	if (rpsGame.nextId < 3 && rpsGame.player === "") {
 		$("#add-player1").click(rpsGame.assignPlayer);
 	}
-
+	//show the relevant information
 	if (rpsGame.player) {
 		$("#player1").hide();
 		$("#playerName").show();
@@ -153,19 +159,16 @@ function drawScreen() {
 		$("#playStatus").text("You won the last game");
 	else if (rpsGame.status === "tie")
 		$("#playStatus").text("The last game tied");
-
-
 }
+
 function makeMessage() {
 	event.preventDefault();
 	if (rpsGame.player) {
-
 		var message = {
 			content: $("#writeMessage").val().trim(),
 			sender: rpsGame.player.name
 		}
 		database.ref("messages/" + nextMessage).set(message);
-
 	}
 }
 
@@ -194,7 +197,7 @@ function messageState(messageData) {
 
 $("#sendMessage").click(makeMessage);
 
-
+//listen to changes at the players node
 database.ref("players/").on("value", function (data) {
 	rpsGame.updateGameState(data);
 
@@ -207,10 +210,13 @@ database.ref("players/").on("value", function (data) {
 	drawScreen();
 }, function (error) {
 	//handle error
+	console.log("Encountered error " + error.code);
 });
+//listen to changes at the messages node
 database.ref("messages/").on("value", function (messageData) {
 	messageState(messageData);
 	drawMessage();
 }, function (error) {
 	//handle error
+	console.log("Encountered error " + error.code);
 });
